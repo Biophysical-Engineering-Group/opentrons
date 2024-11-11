@@ -4,7 +4,7 @@ import sys
 import os
 import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))) # sorry, this is dumb but I didn't want to force you to install this as a package.
-from ot_lib import get_lw_name, get_script_path # You need the above line to be able to import from the parent directory without installing it as a package
+from ot_lib import get_lw_name, get_script_path, create_metadata # You need the above line to be able to import from the parent directory without installing it as a package
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser()
@@ -15,6 +15,8 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument('dest_slot', type=str, help="Destination slot on the Opentron")
     p.add_argument('outfile', type=str, help="The name of the output script")
     p.add_argument('-v', '--volume', type=str, help="Volume to pipette from all wells if not specified in the spreadsheet")
+    p.add_argument('-n', '--protocol_name', type=str, help='Custom name for the protocol (defaults to script name)')
+    p.add_argument('-u', '--user', type=str, help="Your name (defaults to guessing based on your computer's account name)")
     return p
 
 def main():
@@ -23,6 +25,12 @@ def main():
 
     if not args.outfile.endswith('.py'):
         args.outfile = args.outfile+'.py'
+
+    if not args.protocol_name:
+        args.protocol_name = 'pool_from_sheet'
+    
+    if not args.user:
+        args.user = ''
 
     # Load the first sheet of the Excel file
     if args.plate_spreadsheet.endswith('.xls'):
@@ -66,7 +74,7 @@ def main():
         volcol = colnames.index('volume')
         vols = rows.T[volcol]
     if volcol and args.volume:
-        raise(RuntimeError("Conflicting input!  Volume given in both spreadsheet and command line"))
+        raise(RuntimeError("Conflicting input!  Volume specified in both spreadsheet and command line"))
     elif volcol:
         pass
     elif args.volume:
@@ -86,20 +94,25 @@ def main():
     
     if (vols.astype(float) < 20).any() or (vols.astype(float) > 300).any():
         raise(RuntimeError(f"Volumes must be between 20 and 300 µl for a P300 pipette. Wells {', '.join(sources[((vols.astype(float) < 20) ^ (vols.astype(float) > 300))])} outside range."))
-
+    
+    # It would also be good to check to make sure that you won't overfill the target...
 
     source_lw = get_lw_name(args.source_lw)
     dest_lw = get_lw_name(args.dest_lw)
 
     # Generate run script
-    # The number of escapes that required is...
+    # The number of escapes that required is... too many
     outfile = shutil.copy(os.path.join(get_script_path(), 'cherrypick.py'), args.outfile)
     with open(outfile, 'a') as f:
+        # Write the instruction csv string
         f.write("'''\"")
         f.write("Source Labware,Source Slot,Source Well,Source Aspiration Height Above Bottom (in mm),Dest Labware,Dest Slot,Dest Well,Volume (in ul)\\\\n\\\n")
         for s, d, v in zip(sources, dests, vols):
             f.write(f"{source_lw},{args.source_slot},{s},1,{dest_lw},{args.dest_slot},{d},{v}\\\\n\\\n")
         f.write("\"''')\n")
+
+        # Write protocol metadata
+        f.write(create_metadata(args.protocol_name, sys.argv[0], args.user)+'\n')
 
 if __name__ == '__main__':
     main()

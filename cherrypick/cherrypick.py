@@ -7,15 +7,6 @@ def get_values(*names):
     _all_values = json.loads(f'{{"transfer_csv":{mycsv()},"pipette_type":"p300_single_gen2","pipette_mount":"left","tip_type":"standard","tip_reuse":"always"}}')
     return [_all_values[n] for n in names]
 
-
-metadata = {
-    'protocolName': 'Cherrypicking',
-    'author': 'Nick <protocols@opentrons.com>',
-    'source': 'Custom Protocol Request',
-    'apiLevel': '2.3'
-}
-
-
 def run(ctx):
 
     [pipette_type, pipette_mount, tip_type,
