@@ -4,7 +4,7 @@ import sys
 import os
 import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))) # sorry, this is dumb but I didn't want to force you to install this as a package.
-from ot_lib import get_lw_name, get_script_path, create_metadata # You need the above line to be able to import from the parent directory without installing it as a package
+from ot_lib import get_lw_name, get_script_path, create_metadata, get_well_volumes # You need the above line to be able to import from the parent directory without installing it as a package
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser()
@@ -95,7 +95,19 @@ def main():
     if (vols.astype(float) < 20).any() or (vols.astype(float) > 300).any():
         raise(RuntimeError(f"Volumes must be between 20 and 300 µl for a P300 pipette. Wells {', '.join(sources[((vols.astype(float) < 20) ^ (vols.astype(float) > 300))])} outside range."))
     
-    # It would also be good to check to make sure that you won't overfill the target...
+    # Check to make sure you're not going to overfill any wells.
+    targets = list(set(dests))
+    targets.sort()
+    max_fill = get_well_volumes(args.dest_lw, targets)
+    fills = {t : 0 for t in targets}
+    for d, v in zip(dests, vols):
+        fills[d] += float(v)
+    overfilled = []
+    for t, m in zip(targets, max_fill):
+        if fills[t] > m:
+            overfilled.append(t)
+    if len(overfilled) > 0:
+        raise(RuntimeError(f"Target wells {', '.join(overfilled)} will be overfilled with {fills[t]} µl!"))
 
     source_lw = get_lw_name(args.source_lw)
     dest_lw = get_lw_name(args.dest_lw)
