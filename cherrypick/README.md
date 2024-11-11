@@ -11,7 +11,7 @@ Slightly modified cherrypicking script from the [Opentrons repository](https://p
 ### combine_plates
 Pipette every well from one 96-well plate into the same position in another plate.  For combining DNA plates.
 ```
-python combine_plates.py ../labware/abgeneidt_96_wellplate_1.2ul.json 1 ../labware/abgeneidt_96_wellplate_1.2ul.json 2 100 ../runs/combine_example.py
+python combine_plates.py ../labware/abgeneidt_96_wellplate_1.2ul.json 1 ../labware/abgeneidt_96_wellplate_1.2ul.json 2 100 ../runs/example_combine.py
 ```
 
 ### pool_from_sheet
