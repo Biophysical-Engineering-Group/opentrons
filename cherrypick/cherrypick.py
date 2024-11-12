@@ -64,6 +64,8 @@ def run(ctx):
 
     # load pipette
     pip = ctx.load_instrument(pipette_type, pipette_mount, tip_racks=tipracks)
+    pip.flow_rate.aspirate = 1400
+    pip.flow_rate.dispense = 1400
 
     tip_count = 0
     tip_max = len(tipracks*96)
@@ -82,7 +84,7 @@ def run(ctx):
         number = well[1:]
         return letter.upper() + str(int(number))
 
-    if tip_reuse == 'never':
+    if tip_reuse == 'always':
         pick_up()
     for line in transfer_info:
         _, s_slot, s_well, h, _, d_slot, d_well, vol = line[:8]
@@ -90,10 +92,10 @@ def run(ctx):
             int(s_slot)].wells_by_name()[parse_well(s_well)].bottom(float(h))
         dest = ctx.loaded_labwares[
             int(d_slot)].wells_by_name()[parse_well(d_well)]
-        if tip_reuse == 'always':
+        if tip_reuse == 'never':
             pick_up()
-        pip.transfer(float(vol), source, dest, new_tip='never')
-        if tip_reuse == 'always':
+        pip.transfer(float(vol), source, dest, new_tip='always')
+        if tip_reuse == 'never':
             pip.drop_tip()
     if pip.hw_pipette['has_tip']:
         pip.drop_tip()
