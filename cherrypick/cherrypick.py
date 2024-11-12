@@ -4,7 +4,7 @@
 # Yes, everything needs to be in a single Python script.
 def get_values(*names):
     import json
-    _all_values = json.loads(f'{{"transfer_csv":{mycsv()},"pipette_type":"p300_single_gen2","pipette_mount":"left","tip_type":"standard","tip_reuse":"always"}}')
+    _all_values = json.loads(f'{{"transfer_csv":{mycsv()},"pipette_type":"p300_single_gen2","pipette_mount":"left","tip_type":"standard","tip_reuse":"never"}}')
     return [_all_values[n] for n in names]
 
 def run(ctx):
