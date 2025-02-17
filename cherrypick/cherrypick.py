@@ -94,7 +94,7 @@ def run(ctx):
             int(d_slot)].wells_by_name()[parse_well(d_well)]
         if tip_reuse == 'never':
             pick_up()
-        pip.transfer(float(vol), source, dest, new_tip='always')
+        pip.transfer(float(vol), source, dest, new_tip=tip_reuse)
         if tip_reuse == 'never':
             pip.drop_tip()
     if pip.hw_pipette['has_tip']:
