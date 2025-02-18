@@ -4,18 +4,22 @@ The art of taking liquid from a list of specific wells and depositing them in ot
 
 ## Scripts
 
-### cherrypick
-Slightly modified cherrypicking script from the [Opentrons repository](https://protocols.opentrons.com/protocol/cherrypicking).  Modified by the other scripts here to generate experiment-speicific machine instructions.
+### cherrypick_template
+Modified cherrypicking script from the [Opentrons repository](https://protocols.opentrons.com/protocol/cherrypicking).  Further modified by the other scripts here to generate experiment-speicific machine instructions.
 
+### setup_cherrypick
+Take a spreadsheet and the list of labware configuraiton files for each slot, modify cherrypick_template.py to run the provided spreadsheet.  Example of use:
+```
+python setup_cherrypick.py cherrypick_example.xlsx ../labware/corningidt_96_wellplate_500ul.json ../labware/abgeneidt_96_wellplate_1200ul.json ../labware/printed_24_tuberack_1500ul.json ../labware/pcr_48_8strip.json -o ../runs/my_cherrypick.py
+```
+**Required Parameters**  
+* Instruction file : Excel of csv file where each line corresponds to an action.  An example can be found in cherrypick_example.xlsx.  Must have the following columns: source slot, source well, target slot, target well.  Optional columns: volume, aspiration height, mask  
+* Labware files : The list of labware loaded in each slot of the Opentron. This might mean there are repeated entries.
 
-### combine_plates
-Pipette every well from one 96-well plate into the same position in another plate.  For combining DNA plates.
-```
-python combine_plates.py ../labware/abgeneidt_96_wellplate_1.2ul.json 1 ../labware/abgeneidt_96_wellplate_1.2ul.json 2 100 ../runs/example_combine.py
-```
-
-### pool_from_sheet
-Given a plate definition Excel or csv file with additional `Mask`, `Target` and `Volume` columns, pipette `Volume` liquid from wells where `Mask` == 1 into well `Target` in the destination plate.
-```
-python pool_from_sheet.py pool_example.xls ../labware/abgeneidt_96_wellplate_1.2ul.json 1 ../labware/pcr_48_8strip.json 2 ../runs/example_pool.py
-```
+**Optional Parameters**  
+* -o : Ouput file name
+* -v : Specify a single volume (in µl) for every transfer. Required if there is no volume column in the spreadsheet
+* -a : Specify a single aspiration height (in mm) above bottom for each transfer.  Can also be set in the spreadsheet.  If not set, will default to 1 mm
+* -n : The protocol name which will be displayed in the Opentrons app on the device computer.
+* -u : Your name.  If not set, will be your account name on your computer
+* -t : If set, don't drop tips between transfers.  Used for testing
