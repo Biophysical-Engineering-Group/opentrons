@@ -5,6 +5,12 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))) # sorry, this is dumb but I didn't want to force you to install this as a package.
 from ot_lib import get_lw_name, get_script_path, create_metadata, get_well_volumes, read_excel # You need the above line to be able to import from the parent directory without installing it as a package
  
+# Example command (run from cherrypick/):
+# python setup_cherrypick.py cherrypick_example.xlsx ../labware/corningidt_96_wellplate_500ul.json ../labware/abgeneidt_96_wellplate_1200ul.json ../labware/printed_24_tuberack_1500ul.json ../labware/pcr_48_8strip.json -o ../runs/my_cherrypick.py 
+
+# To test locally (run from runs/):
+# opentrons_simulate -L ../labware my_cherrypick.py
+
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser()
     p.add_argument('instruction_spreadsheet', type=str, help="xls, xlsx, or csv file containing 'Source slot', 'Source Well', 'Target slot', and 'Target Well' columns.  Optionally, 'Mask' and 'Volume'.")
