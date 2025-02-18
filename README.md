@@ -6,9 +6,9 @@ Protocol and usage instructions can be found in the OneNote at `ZMBH - BPE Noteb
 [xlrd](https://xlrd.readthedocs.io/en/latest/), [openpyxl](https://openpyxl.readthedocs.io/en/stable/), [numpy](https://numpy.org)
 
 ```
-conda install -c conda-forge xlrd openpyxl numpy
+conda install -c conda-forge xlrd openpyxl
 ```
 or
 ```
-python -m pip install xlrd openpyxl numpy
+python -m pip install xlrd openpyxl
 ```
