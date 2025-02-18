@@ -2,7 +2,28 @@ import os
 import sys
 import json
 import getpass
-from typing import List
+from typing import List, Dict
+
+def read_excel(excel_file:str) -> Dict[str, List]:
+    if excel_file.endswith('.xls'):
+        import xlrd
+        sheet = xlrd.open_workbook(excel_file).sheet_by_index(0)
+        cols = [sheet.col_values(colx) for colx in range(sheet.ncols)]
+    elif excel_file.endswith('.xlsx'):
+        import openpyxl
+        sheet = openpyxl.load_workbook(excel_file).active
+        cols = list(sheet.iter_cols(values_only=True))
+    elif excel_file.endswith('.csv'):
+        with open(excel_file, 'r') as f:
+            rows = [r.split(',') for r in f.readlines()]
+            cols = list(map(list, zip(*rows)))
+    else:
+        raise(RuntimeError("File {excel_file} does not appear to be an Excel file (should end in xls, xlsx or csv)"))
+    
+    output = {cols[i][0].lower() : list(cols[i][1:]) for i in range(len(cols))}
+    output['row numbers'] = list(range(2, len(output['source well'])+2))
+
+    return output
 
 def get_lw_name(def_file:str) -> str:
     """
@@ -17,7 +38,7 @@ def get_lw_name(def_file:str) -> str:
     with open(def_file, 'r') as f:
         return(json.load(f)["parameters"]["loadName"])
     
-def get_well_volumes(def_file:str, wells:List[str]=[]) -> str:
+def get_well_volumes(def_file:str, wells:List[str]=[]) -> List[float]:
     """
     Get the volumes of a set of wells from the labware definition file
     Parameters:
@@ -65,6 +86,6 @@ metadata = {{
     'protocolName' : \'{proto_name}\',
     'author' : \'{u_name}\',
     'source' : \'{source_script}\',
-    'apiLevel' : '2.3'
+    'apiLevel' : '2.20'
 }}
 """)
