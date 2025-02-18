@@ -113,7 +113,7 @@ def main():
             raise(RuntimeError(f"Well {tw} in slot {str(ts)} will be overfilled by {abs(fill_volumes[str(ts)+tw])} µl by instruction in row {rn}"))
 
     # Generate run script
-    outfile = shutil.copy(os.path.join(get_script_path(), 'cherrypick.py'), args.outfile)
+    outfile = shutil.copy(os.path.join(get_script_path(), 'cherrypick_template.py'), args.outfile)
     with open(outfile, 'a') as f:
         # Write the instruction json function
         f.write("def myjson():\n")
