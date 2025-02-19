@@ -11,7 +11,7 @@ def read_excel(excel_file:str) -> Dict[str, List]:
         cols = [sheet.col_values(colx) for colx in range(sheet.ncols)]
     elif excel_file.endswith('.xlsx'):
         import openpyxl
-        sheet = openpyxl.load_workbook(excel_file).active
+        sheet = openpyxl.load_workbook(excel_file, data_only=True).active
         cols = list(sheet.iter_cols(values_only=True))
     elif excel_file.endswith('.csv'):
         with open(excel_file, 'r') as f:
